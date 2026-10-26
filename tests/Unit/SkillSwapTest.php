@@ -94,6 +94,18 @@ describe('matchSkillsToUser', function () {
         expect($result)->toBe([]);
     });
 
+    test('matches every category for the All category', function () {
+        $userNeeds = ['category' => 'All', 'maxPrice' => 20];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([
+            ['title' => 'Python Tutoring', 'category' => 'Programming', 'price' => 20],
+            ['title' => 'Guitar Lessons', 'category' => 'Music', 'price' => 15],
+            ['title' => 'Resume Review', 'category' => 'Career', 'price' => 0],
+        ]);
+    });
+
     test('includes free skills', function () {
         $userNeeds = ['category' => 'Career', 'maxPrice' => 0];
 

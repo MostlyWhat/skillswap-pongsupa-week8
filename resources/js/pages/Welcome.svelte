@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Form, Link, page } from '@inertiajs/svelte';
     import CalculateCostController from '@/actions/App/Http/Controllers/CalculateCostController';
+    import MatchSkillsController from '@/actions/App/Http/Controllers/MatchSkillsController';
     import AppHead from '@/components/AppHead.svelte';
     import InputError from '@/components/InputError.svelte';
     import { Button } from '@/components/ui/button';
@@ -19,17 +20,29 @@
 
     let {
         categories,
-        skillsByCategory,
+        skills,
     }: {
         categories: string[];
-        skillsByCategory: Record<string, Skill[]>;
+        skills: Skill[];
     } = $props();
 
-    let selectedCategory = $state('All');
-
-    const skills = $derived(skillsByCategory[selectedCategory] ?? []);
-
     const totalCost = $derived(page.flash.totalCost as number | undefined);
+
+    let matchCategory = $state('All');
+
+    // The last match result. It stays until the next match, so other forms do not clear it.
+    let matchedSkills = $state<Skill[] | undefined>(undefined);
+
+    $effect(() => {
+        const flashedSkills = page.flash.matchedSkills as Skill[] | undefined;
+
+        if (flashedSkills !== undefined) {
+            matchedSkills = flashedSkills;
+        }
+    });
+
+    // Show the match result after a match, and all the skills before the first match
+    const shownSkills = $derived(matchedSkills ?? skills);
 
     const auth = $derived(page.props.auth);
 </script>
@@ -110,16 +123,42 @@
         <h2 class="text-[#706f6c] dark:text-[#A1A09A]">SkillSwap is your go-to hub for cost-effective learning with talented peers. Get started today with our curated skills.</h2>
     </div>
     <div class="mb-6 w-full max-w-[335px] lg:max-w-4xl">
-        <Select type="single" bind:value={selectedCategory}>
-            <SelectTrigger class="w-56" aria-label="Filter skills by category">
-                {selectedCategory}
-            </SelectTrigger>
-            <SelectContent>
-                {#each categories as category (category)}
-                    <SelectItem value={category} label={category} />
-                {/each}
-            </SelectContent>
-        </Select>
+        <Form
+            {...MatchSkillsController.form()}
+            options={{ preserveScroll: true, preserveState: true }}
+            class="flex flex-col gap-4 lg:flex-row lg:items-end"
+        >
+            {#snippet children({ errors, processing })}
+                <div class="grid gap-2">
+                    <Label for="match_category">Category</Label>
+                    <Select type="single" name="category" bind:value={matchCategory}>
+                        <SelectTrigger id="match_category" class="w-56">
+                            {matchCategory}
+                        </SelectTrigger>
+                        <SelectContent>
+                            {#each categories as category (category)}
+                                <SelectItem value={category} label={category} />
+                            {/each}
+                        </SelectContent>
+                    </Select>
+                    <InputError message={errors.category} />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="max_price">Max price per hour ($)</Label>
+                    <Input
+                        id="max_price"
+                        name="max_price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="No limit"
+                        class="w-40"
+                    />
+                    <InputError message={errors.max_price} />
+                </div>
+                <Button type="submit" disabled={processing}>Find My Match</Button>
+            {/snippet}
+        </Form>
     </div>
     <div
         class="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 starting:opacity-0 lg:mb-auto"
@@ -127,7 +166,10 @@
         <main
             class="flex w-full max-w-[335px] flex-col-reverse overflow-hidden rounded-lg lg:max-w-4xl lg:flex-row gap-4"
         >
-            {#each skills as skill (skill.tutor)}
+            {#if shownSkills.length === 0}
+                <p class="text-[13px] text-[#706f6c] dark:text-[#A1A09A]" aria-live="polite">No skills match your needs.</p>
+            {/if}
+            {#each shownSkills as skill (skill.tutor)}
                 <div
                     class="flex-1 rounded-lg bg-white p-6 text-[13px] leading-5 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"
                 >
@@ -195,7 +237,7 @@
         </p>
         <Form
             {...CalculateCostController.form()}
-            options={{ preserveScroll: true }}
+            options={{ preserveScroll: true, preserveState: true }}
             class="flex flex-col gap-4 lg:flex-row lg:items-end"
         >
             {#snippet children({ errors, processing })}

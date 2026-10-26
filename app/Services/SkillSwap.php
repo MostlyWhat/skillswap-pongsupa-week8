@@ -44,7 +44,8 @@ class SkillSwap
     }
 
     /**
-     * Get the skills that match the user's category and are within the user's max price.
+     * Get the skills that match the user's category ("All" for every category)
+     * and are within the user's max price.
      *
      * @template TSkill of array{category: string, price: int|float}
      *
@@ -59,9 +60,11 @@ class SkillSwap
 
         // Go through all the skills
         foreach ($skills as $skill) {
-            // If the skill category is the same as the user's category
-            // and the skill price is not more than the user's max price
-            if ($skill['category'] === $userNeeds['category'] && $skill['price'] <= $userNeeds['maxPrice']) {
+            // If the user wants every category, or the skill category is the same as the user's category
+            $categoryMatches = $userNeeds['category'] === 'All' || $skill['category'] === $userNeeds['category'];
+
+            // If the category matches and the skill price is not more than the user's max price
+            if ($categoryMatches && $skill['price'] <= $userNeeds['maxPrice']) {
                 // Append to matched skills
                 $matchedSkills[] = $skill;
             }
