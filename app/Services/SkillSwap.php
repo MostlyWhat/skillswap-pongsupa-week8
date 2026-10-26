@@ -42,4 +42,31 @@ class SkillSwap
         // Multiply the hourly rate by the hours, so a free rate or zero hours gives 0
         return $hourlyRate * $hours;
     }
+
+    /**
+     * Get the skills that match the user's category and are within the user's max price.
+     *
+     * @template TSkill of array{category: string, price: int|float}
+     *
+     * @param  array{category: string, maxPrice: int|float}  $userNeeds
+     * @param  list<TSkill>  $skills
+     * @return list<TSkill>
+     */
+    public function matchSkillsToUser(array $userNeeds, array $skills): array
+    {
+        // Matched skills for the user
+        $matchedSkills = [];
+
+        // Go through all the skills
+        foreach ($skills as $skill) {
+            // If the skill category is the same as the user's category
+            // and the skill price is not more than the user's max price
+            if ($skill['category'] === $userNeeds['category'] && $skill['price'] <= $userNeeds['maxPrice']) {
+                // Append to matched skills
+                $matchedSkills[] = $skill;
+            }
+        }
+
+        return $matchedSkills;
+    }
 }
