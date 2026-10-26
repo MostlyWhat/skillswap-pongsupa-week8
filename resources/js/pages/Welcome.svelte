@@ -1,12 +1,28 @@
 <script lang="ts">
     import { Link, page } from '@inertiajs/svelte';
     import AppHead from '@/components/AppHead.svelte';
+    import {
+        Select,
+        SelectContent,
+        SelectItem,
+        SelectTrigger,
+    } from '@/components/ui/select';
     import { toUrl } from '@/lib/utils';
     import { dashboard, login } from '@/routes';
     import { register } from '@/routes';
     import type { Skill } from '@/types';
 
-    let { skills }: { skills: Skill[] } = $props();
+    let {
+        categories,
+        skillsByCategory,
+    }: {
+        categories: string[];
+        skillsByCategory: Record<string, Skill[]>;
+    } = $props();
+
+    let selectedCategory = $state('All');
+
+    const skills = $derived(skillsByCategory[selectedCategory] ?? []);
 
     const auth = $derived(page.props.auth);
 </script>
@@ -85,6 +101,18 @@
         <h1 class="text-4xl font-bold">Learn. Share. Earn.</h1>
         <br>
         <h2 class="text-[#706f6c] dark:text-[#A1A09A]">SkillSwap is your go-to hub for cost-effective learning with talented peers. Get started today with our curated skills.</h2>
+    </div>
+    <div class="mb-6 w-full max-w-[335px] lg:max-w-4xl">
+        <Select type="single" bind:value={selectedCategory}>
+            <SelectTrigger class="w-56" aria-label="Filter skills by category">
+                {selectedCategory}
+            </SelectTrigger>
+            <SelectContent>
+                {#each categories as category (category)}
+                    <SelectItem value={category} label={category} />
+                {/each}
+            </SelectContent>
+        </Select>
     </div>
     <div
         class="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 starting:opacity-0 lg:mb-auto"
