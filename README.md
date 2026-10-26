@@ -8,7 +8,7 @@ lessons verified by users-alike.
 
 SkillSwap design and implementation for Rize's Software Development Course by Pongsupa "Poonpun" Supapa.
 
-This is the Week 8 Release Version.
+This is the Week 8 Release Version, the test command can be seen below, it will output the result for all the tests.
 
 ## Prerequisite
 
@@ -49,6 +49,12 @@ Note: You can use [php.new](https://php.new/) to install everything above except
 
    ```bash
    composer run dev
+   ```
+
+7. Running tests
+
+   ```bash
+   php artisan test
    ```
 
 ## Tech Stack
