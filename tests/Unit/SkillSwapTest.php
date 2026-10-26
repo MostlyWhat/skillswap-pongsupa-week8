@@ -35,3 +35,22 @@ describe('filterSkillsByCategory', function () {
         expect($result)->toBe([]);
     });
 });
+
+describe('calculateTotalCost', function () {
+    test('returns the correct total for different rates and hours', function () {
+        expect($this->skillSwap->calculateTotalCost(20, 2))->toEqual(40);
+        expect($this->skillSwap->calculateTotalCost(15, 3))->toEqual(45);
+    });
+
+    test('returns 0 for a free session', function () {
+        expect($this->skillSwap->calculateTotalCost(0, 3))->toEqual(0);
+    });
+
+    test('returns 0 for zero hours', function () {
+        expect($this->skillSwap->calculateTotalCost(20, 0))->toEqual(0);
+    });
+
+    test('returns the correct total for decimal hours', function () {
+        expect($this->skillSwap->calculateTotalCost(25, 1.5))->toEqual(37.5);
+    });
+});
