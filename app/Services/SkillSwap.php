@@ -9,7 +9,7 @@ class SkillSwap
      *
      * @template TSkill of array{category: string}
      *
-     * @param  list<TSkill>  $skills
+     * @param list<TSkill> $skills
      * @return list<TSkill>
      */
     public function filterSkillsByCategory(array $skills, string $category): array
@@ -32,5 +32,14 @@ class SkillSwap
         }
 
         return $filteredSkills;
+    }
+
+    /**
+     * Get the total cost of a session from the hourly rate and the hours.
+     */
+    public function calculateTotalCost(int|float $hourlyRate, int|float $hours): int|float
+    {
+        // Multiply the hourly rate by the hours, so a free rate or zero hours gives 0
+        return $hourlyRate * $hours;
     }
 }
