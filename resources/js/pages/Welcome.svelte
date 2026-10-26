@@ -1,6 +1,11 @@
 <script lang="ts">
-    import { Link, page } from '@inertiajs/svelte';
+    import { Form, Link, page } from '@inertiajs/svelte';
+    import CalculateCostController from '@/actions/App/Http/Controllers/CalculateCostController';
     import AppHead from '@/components/AppHead.svelte';
+    import InputError from '@/components/InputError.svelte';
+    import { Button } from '@/components/ui/button';
+    import { Input } from '@/components/ui/input';
+    import { Label } from '@/components/ui/label';
     import {
         Select,
         SelectContent,
@@ -23,6 +28,8 @@
     let selectedCategory = $state('All');
 
     const skills = $derived(skillsByCategory[selectedCategory] ?? []);
+
+    const totalCost = $derived(page.flash.totalCost as number | undefined);
 
     const auth = $derived(page.props.auth);
 </script>
@@ -179,6 +186,54 @@
             {/each}
         </main>
     </div>
+    <section
+        class="mt-6 w-full max-w-[335px] rounded-lg bg-white p-6 text-[13px] leading-5 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:max-w-4xl dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"
+    >
+        <h2 class="mb-1 font-medium">Cost Calculator</h2>
+        <p class="mb-4 text-[#706f6c] dark:text-[#A1A09A]">
+            Enter an hourly rate and the number of hours to see the total cost of a session.
+        </p>
+        <Form
+            {...CalculateCostController.form()}
+            options={{ preserveScroll: true }}
+            class="flex flex-col gap-4 lg:flex-row lg:items-end"
+        >
+            {#snippet children({ errors, processing })}
+                <div class="grid gap-2">
+                    <Label for="hourly_rate">Hourly rate ($)</Label>
+                    <Input
+                        id="hourly_rate"
+                        name="hourly_rate"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                        placeholder="20"
+                    />
+                    <InputError message={errors.hourly_rate} />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="hours">Hours</Label>
+                    <Input
+                        id="hours"
+                        name="hours"
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        required
+                        placeholder="2"
+                    />
+                    <InputError message={errors.hours} />
+                </div>
+                <Button type="submit" disabled={processing}>Calculate</Button>
+            {/snippet}
+        </Form>
+        {#if totalCost !== undefined}
+            <p class="mt-4 text-base font-medium" aria-live="polite">
+                Total cost: {totalCost === 0 ? 'Free' : `$${totalCost.toFixed(2)}`}
+            </p>
+        {/if}
+    </section>
     <footer class="pt-6 text-[#1b1b18] dark:text-[#EDEDEC] w-full max-w-[335px] lg:max-w-4xl">
         <p class="text-[#706f6c] dark:text-[#A1A09A]">SkillSwap is a platform for users to learn new skills cost-effectively through high-quality and personal learning experience with a verified expert.</p>
         <br>
