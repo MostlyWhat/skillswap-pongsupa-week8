@@ -54,3 +54,65 @@ describe('calculateTotalCost', function () {
         expect($this->skillSwap->calculateTotalCost(25, 1.5))->toEqual(37.5);
     });
 });
+
+describe('matchSkillsToUser', function () {
+    beforeEach(function () {
+        $this->skills = [
+            ['title' => 'Python Tutoring', 'category' => 'Programming', 'price' => 20],
+            ['title' => 'JavaScript Help', 'category' => 'Programming', 'price' => 25],
+            ['title' => 'Guitar Lessons', 'category' => 'Music', 'price' => 15],
+            ['title' => 'Resume Review', 'category' => 'Career', 'price' => 0],
+        ];
+    });
+
+    test('matches skills by category and price', function () {
+        $userNeeds = ['category' => 'Programming', 'maxPrice' => 30];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([
+            ['title' => 'Python Tutoring', 'category' => 'Programming', 'price' => 20],
+            ['title' => 'JavaScript Help', 'category' => 'Programming', 'price' => 25],
+        ]);
+    });
+
+    test('leaves out skills above the max price', function () {
+        $userNeeds = ['category' => 'Programming', 'maxPrice' => 20];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([
+            ['title' => 'Python Tutoring', 'category' => 'Programming', 'price' => 20],
+        ]);
+    });
+
+    test('returns an empty array when no skills match', function () {
+        $userNeeds = ['category' => 'Cooking', 'maxPrice' => 100];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([]);
+    });
+
+    test('matches every category for the All category', function () {
+        $userNeeds = ['category' => 'All', 'maxPrice' => 20];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([
+            ['title' => 'Python Tutoring', 'category' => 'Programming', 'price' => 20],
+            ['title' => 'Guitar Lessons', 'category' => 'Music', 'price' => 15],
+            ['title' => 'Resume Review', 'category' => 'Career', 'price' => 0],
+        ]);
+    });
+
+    test('includes free skills', function () {
+        $userNeeds = ['category' => 'Career', 'maxPrice' => 0];
+
+        $result = $this->skillSwap->matchSkillsToUser($userNeeds, $this->skills);
+
+        expect($result)->toBe([
+            ['title' => 'Resume Review', 'category' => 'Career', 'price' => 0],
+        ]);
+    });
+});
