@@ -23,12 +23,12 @@ systems.
 
 Reference: [Laravel Testing Documentation](https://laravel.com/framework/docs/testing)
 
-### 2.2 Pest and PHPUnit
+## Pest and PHPUnit
 
 Laravel supports two test frameworks, Pest and PHPUnit, which is the PHP testing just like Jest on JavaScript. The
 Laravel Svelte starter kit uses Pest, so I used Pest to match the existing tests and the documentation on their website.
 
-### 2.3 The parts of a Pest test file
+## The parts of a Pest test file
 
 My unit test file uses these Pest features:
 
