@@ -8,7 +8,44 @@ lessons verified by users-alike.
 
 SkillSwap design and implementation for Rize's Software Development Course by Pongsupa "Poonpun" Supapa.
 
-This is the Week 8 Release Version, the test command can be seen below, it will output the result for all the tests.
+This is the Week 8 Release Version, this version includes the changes below.
+
+- Docker Installation and Running Method
+- Updated README.md instructions
+- Documentation on how unit testing and test-driven development works in Laravel [here](/docs/laravel-unit-testing.md)
+
+## Docker Installation for Production Preview
+
+Please make sure that [Docker](https://docs.docker.com/get-docker/) is installed for this method. The image installs PHP
+and Composer via [php.new](https://php.new/), and Node.js and npm, then runs the same steps as the installation below.
+
+1. Clone the repository and cd to cloned project directory.
+2. Build the Docker container:
+
+   ```bash
+   docker build -t skillswap .
+   ```
+
+3. Start the development server and open the ports, Laravel runs on port 8000 and Vite on port 5173, but only 8000 is
+   needed to see the changes:
+
+   ```bash
+   docker run --rm -p 8000:8000 -p 5173:5173 skillswap
+   ```
+
+4. Open [http://localhost:8000](http://localhost:8000) in your browser to view and test the website.
+
+5. Running tests by sending a remote testing command to the skillswap container.
+
+   ```bash
+   docker run --rm skillswap php artisan test
+   ```
+
+6. Any other php commands must also be run the same way inside the container.
+
+   ```bash
+   docker run --rm skillswap INSERT_COMMAND_HERE
+   ```
 
 ## Prerequisite
 
@@ -21,10 +58,10 @@ Please make sure to have the following packages installed:
 
 Note: You can use [php.new](https://php.new/) to install everything above except Node.js and npm.
 
-## Installation
+## Installation for Local Development
 
 1. Install the packages above.
-2. Clone the repository and cd to cloned project directory.
+2. Clone the repository, cd to cloned project directory, and run the commands below.
 3. Install dependencies:
 
     ```bash
@@ -39,7 +76,7 @@ Note: You can use [php.new](https://php.new/) to install everything above except
    php artisan key:generate
    ```
 
-5. Configure your database connection in `.env`, then run migrations:
+5. Configure your database connection in `.env`, then run migrations, currently defaults to sqlite:
 
    ```bash
    php artisan migrate
